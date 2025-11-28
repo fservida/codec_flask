@@ -28,14 +28,16 @@ def get_sheet_data():
 
     try:
         # Load the Excel file
-        excel_data = pd.ExcelFile(EXCEL_FILE_PATH)
+        # Force openpyxl and read_only engine argument to avoid locking the excel file and allow excel to save
+        excel_data = pd.ExcelFile(EXCEL_FILE_PATH, engine="openpyxl", engine_kwargs={"read_only": True})
 
         # Check if the requested sheet exists
         if sheet_name not in excel_data.sheet_names:
             abort(404, description=f"Sheet '{sheet_name}' not found in the Excel file.")
 
         # Read the specific sheet into a DataFrame, using the row at `offset - 1` as the header
-        df = pd.read_excel(EXCEL_FILE_PATH, sheet_name=sheet_name, skiprows=offset - 1, header=None)
+        # Force openpyxl and read_only engine argument to avoid locking the excel file and allow excel to save
+        df = pd.read_excel(EXCEL_FILE_PATH, sheet_name=sheet_name, skiprows=offset - 1, header=None, engine="openpyxl", engine_kwargs={"read_only": True})
 
         # Apply transformations to handle NaN, boolean, datetime, and time values
         def transform(value):
